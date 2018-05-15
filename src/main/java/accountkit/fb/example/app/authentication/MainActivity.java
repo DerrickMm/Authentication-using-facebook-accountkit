@@ -15,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import com.facebook.accountkit.AccessToken;
 import com.facebook.accountkit.Account;
 import com.facebook.accountkit.AccountKit;
@@ -28,7 +27,6 @@ import com.facebook.accountkit.ui.AccountKitConfiguration;
 import com.facebook.accountkit.ui.LoginType;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-
 import java.util.HashMap;
 import java.util.Map;
 import butterknife.BindView;
@@ -62,23 +60,8 @@ public class MainActivity extends AppCompatActivity {
         AccessToken accessToken = AccountKit.getCurrentAccessToken();
         if (accessToken != null) {
             //Handle Returning User
-            AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
-                @Override
-                public void onSuccess(final Account account) {
-                    final PhoneNumber number = account.getPhoneNumber();
-                    registrationID =number.toString();
-                }
-
-                @Override
-                public void onError(final AccountKitError error) {
-                }
-            });
 
             Intent i=new Intent(MainActivity.this,SuccessActivity.class);
-            SharedPreferences pref = getApplicationContext().getSharedPreferences("Login", 0);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString("regId", registrationID);
-            editor.commit();
             finish();
             startActivity(i);
 
@@ -120,21 +103,23 @@ public class MainActivity extends AppCompatActivity {
             final long tokenRefreshIntervalInSeconds =
                     loginResult.getTokenRefreshIntervalInSeconds();
             if (accessToken != null) {
+                //Successful login.
                 this.finish();
                 toastMessage = "Success";
                 AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
                     @Override
                     public void onSuccess(Account account) {
-
                         final PhoneNumber number = account.getPhoneNumber();
                         String pn=number.toString();
                         registrationID =(pn.substring(4));
+
+                        //For this example i have added the phone number to shared preferences.
                         SharedPreferences pref = getApplicationContext().getSharedPreferences("Login", 0);
                         SharedPreferences.Editor editor = pref.edit();
-                        editor.putString("supplierId", registrationID);
+                        editor.putString("Phone_Number", registrationID);
                         editor.commit();
 
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), SuccessActivity.class));
                     }
 
                     @Override
